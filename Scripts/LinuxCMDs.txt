@@ -1,0 +1,73 @@
+
+
+#######
+#Do phages
+#######
+
+#assuming that all phages are in input_phage_fastas/
+
+#run ANI
+average_nucleotide_identity.py -i input_phage_fastas/ -o aniM --workers 20
+
+####
+#****WARNING, NOT USING -strand both!*****
+####
+#make clusters at 70%
+mkdir clusters70
+vsearch --cluster_fast all_phages.fna -id 0.70  --maxseqlength 500000 --threads 20 --uc all_phages.uc70 --clusters clusters70/all.uc70_
+
+#should use
+nohup vsearch -cluster_fast all_phages.fna -id .60 -uc all_phages.uc60_def2 --clusters clusters60_def2/all.uc60_def2_ --threads 10 --iddef 2 --strand both --maxseqlength 300000 --log vs_60_2.log &
+
+
+nohup vsearch -cluster_fast all_phages.fna -id .60 -uc all_phages.uc60_def3 --clusters clusters60_def3/all.uc60_def3_ --threads 10 --iddef 3 --strand both --maxseqlength 300000 --log vs_60_3.log &
+
+
+#annotate clusters
+mkdir blast_out_genomes
+for i in clusters70/*; do echo "$i"; j=$(basename $i); echo $j; blastn -query $i -db phage_db/17Jan2022_genomes.fa -outfmt '6 qseqid sseqid pident length qcovs qcovhsp  mismatch gapopen qstart qend sstart send evalue bitscore' > blast_out_genomes/$j.blast ; done
+
+
+######
+#Do bacteria
+######
+
+#download genomes
+....
+
+#something is wrong with, way to short
+#are plasmids
+CP064819.1.fasta
+CP035412.1.fasta
+CP020024.1.fasta
+CP028216.1.fasta
+CP035398.1.fasta
+AP019715.1.fasta
+CP045813.1.fasta
+CP045923.1.fasta
+CP045822.1.fasta
+CP022288.1.fasta
+CP035192.1.fasta
+CP035407.1.fasta
+CP035392.1.fasta
+
+#only one contig in all?
+for i in bac_genomes/*; do  seqkit stats -a  "$i" | tail -n 1;  done | sort -n -k5 > polonca_stats.txt
+
+#move big files, e.g. bacterial genomes
+find polonca/ -type f -size +2M -exec mv "{}" bac_genomes/ \;
+
+#move wonky genomes back out
+mv CP018295.1.fasta CP009611.1.fasta CP009749.1.fasta CP009748.1.fasta CP014840.1.fasta  ../polonca/ 
+
+
+#run prokka
+echo "ls bac_genomes/ | parallel -j 20 ' prokka --compliant --centre DTU --outdir prokka_out/{.} --cpus 1 --quiet --force --locustag {.} --prefix {.} bac_genomes/{}' " > prokka_cmd
+chmod 755 prokka_cmd
+nohup prokka_cmd &
+
+#run roary
+roary -e --mafft -p 20 -f roary_out $( find prokka_out/ -name "*gff" )
+
+#make tree
+FastTree –nt –gtr core_gene_alignment.aln > Bsub_reduced.tree

@@ -293,7 +293,7 @@ g = function(...) {
   return(List)
 }
 
-AnnotateClusters=function(blastDir="Data/blast_out_genomes/",headerPath="Data/genome_headers.txt", verbose=F) {
+AnnotateClusters=function(blastDir="Data/blast_out_genomes70/",headerPath="Data/genome_headers.txt", verbose=F,plotAlligns=F ) {
   library(stringr)
   headers=readLines(headerPath)
   headerDF=cbind(headers,str_split_fixed(headers, " " , 2))
@@ -309,6 +309,7 @@ AnnotateClusters=function(blastDir="Data/blast_out_genomes/",headerPath="Data/ge
   summaryDF=data.frame(clusterFile=basename(blastFiles),cluster=gsub(".*uc.._([0-9]*).blast$","\\1", blastFiles),bestVote="None",voteFrac=0, maxCov=0)
   
   blastCounter=1
+  blast=blastFiles[1]
   for(blast in blastFiles){
     
     # if(blast=="blast_out_genomes/all.uc70_21.blast"){
@@ -324,6 +325,22 @@ AnnotateClusters=function(blastDir="Data/blast_out_genomes/",headerPath="Data/ge
     
     blastFile=read.table(blast)
     colnames(blastFile)=blastCols
+    
+    if(plotAlligns) {
+      plot(0, 0, xlim=c(0,max(blastFile$qstart)),ylim=c(0,length(unique(blastFile$sseqid))), col=0,main=basename(blast))
+      
+      m=unique(blastFile$sseqid)[1]
+      subCounter=1
+      for(m in unique(blastFile$sseqid)) {
+        idCols=color.gradient(blastSub$pident)
+        blastSub=subset(blastFile, sseqid == m)
+        
+        for(k in 1:NROW(blastSub)){
+          lines(x=c(blastSub$qstart[k],blastSub$qend[k]), y=c(subCounter,subCounter), col=idCols[k], lwd=2 )
+        }
+        subCounter=subCounter+1
+      }
+    }
     
     blastFile$weightId=(blastFile$pident/100) * blastFile$qcovhsp
     

@@ -1,5 +1,5 @@
-
-aa=AnnotateClusters()
+source("Scripts/functions.R")
+aa=AnnotateClusters(blastDir = "Data/blast_out_genomes70/", headerPath = "Data/genome_headers.txt", plotAlligns = F)
 
 which.max(maxes)
 

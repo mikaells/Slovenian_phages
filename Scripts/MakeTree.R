@@ -13,14 +13,14 @@ rm(list=ls());gc()
 dev.off()
 source("Scripts/functions.R")
 
-printPdf=T
+printPdf=F
 aniPath="Data/ani/ANIm_hadamard.tab"
 treePath="Data/roary_out/Bsub_reduced.tree"
 ucPath="Data/all_phages.uc70_def2"
 meshPath="Data/meshout70.txt"
 minCluster=3
 
-k=dir(path = "Data/",pattern = "uc", full.names = T)[2]
+k=dir(path = "Data/",pattern = "uc", full.names = T)[1]
 
 for(k in dir(path = "Data/",pattern = "uc", full.names = T)) {
   
@@ -34,7 +34,7 @@ for(k in dir(path = "Data/",pattern = "uc", full.names = T)) {
   meta$ClusterFix
   
   #make annotation matrix mapping phages to phylogeny
-  annot=AnnotateClusters(blastDir = "Data/blast_out_genomes/")
+  annot=AnnotateClusters(blastDir = "Data/blast_out_genomes70/")
   
   #read in raw tree
   tree0=read.tree(treePath)

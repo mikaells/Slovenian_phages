@@ -12,15 +12,15 @@ printPdf=T
 aniPath="Data/ani/ANIm_hadamard.tab"
 ucPath="Data/all_phages.uc70_def2"
 meshPath="Data/meshout70.txt"
-blastDir="Data/blast_out_genomes/"
+blastDir="Data/blast_out_genomes70/"
 minCluster=3
 addAnnotation=F
 useMesh=F
 runBig=T
 
 k=dir(path = "Data/",pattern = "uc", full.names = T)[1]
+
 for(k in dir(path = "Data/",pattern = "uc", full.names = T)) {
-  
   
   g(ANI, meta) %=% BuildData(aniPath = aniPath, ucPath = k,minCluster = minCluster,meshPath = meshPath,useMesh = useMesh)#, subs=1:100)
   

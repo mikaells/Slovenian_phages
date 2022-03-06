@@ -325,6 +325,7 @@ AnnotateClusters=function(blastDir="Data/blast_out_genomes70/",headerPath="Data/
     
     blastFile=read.table(blast)
     colnames(blastFile)=blastCols
+    blastFile$weightId=(blastFile$pident/100) * blastFile$length
     
     if(plotAlligns) {
       plot(0, 0, xlim=c(0,max(blastFile$qstart)),ylim=c(0,length(unique(blastFile$sseqid))), col=0,main=basename(blast))
@@ -342,7 +343,7 @@ AnnotateClusters=function(blastDir="Data/blast_out_genomes70/",headerPath="Data/
       }
     }
     
-    blastFile$weightId=(blastFile$pident/100) * blastFile$qcovhsp
+    
     
     uniqGenos=unique(blastFile$qseqid) 
     
